@@ -1,11 +1,13 @@
-using CayTuyChinh;
+using CustomizeLib;
+using CustomizeLib.MelonLoader; // ← THÊM DÒNG NÀY
 using HarmonyLib;
 using Il2Cpp;
 using Il2CppInterop.Runtime.Injection;
+using Il2CppInterop.Runtime.InteropTypes.Arrays; // ← THÊM DÒNG NÀY nếu cần
 using MelonLoader;
 using UnityEngine;
 using System;
-using GiaoDienTuyChinh;
+using System.Collections.Generic; // ← THÊM DÒNG NÀY nếu cần
 
 [assembly: MelonInfo(typeof(HoaBang.Core), "PvzRhTomiSakaeMods v1.0 - HoaBang", "1.0.0", "TomiSakae", null)]
 [assembly: MelonGame("LanPiaoPiao", "PlantsVsZombiesRH")]
@@ -33,20 +35,30 @@ namespace HoaBang
         public override void OnInitializeMelon()
         {
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            var ab = CustomCore.GetAssetBundle(MelonAssembly.Assembly, "hoabang");
-            CustomCore.RegisterCustomPlant<Producer, LopHoaBang>(HoaBangPlantId, ab.GetAsset<GameObject>("SunflowerPrefab"),
-                ab.GetAsset<GameObject>("SunflowerPreview"), [(1, 10), (10, 1)], 0f, 15f, 0, 300, 15f, 200);
-            
-            string plantName = "Hướng Dương Băng"; // Tên hiển thị
+            var ab = CustomCore.GetAssetBundle(MelonAssembly.Assembly, "new_sunflower");
+
+            // Dùng Cast như có thể thấy trong các mod Il2Cpp khác
+            GameObject sunflowerPrefab = ab.LoadAsset("SunflowerPrefab").Cast<GameObject>();
+            GameObject sunflowerPreview = ab.LoadAsset("SunflowerPreview").Cast<GameObject>();
+
+            CustomCore.RegisterCustomPlant<Producer, LopHoaBang>(
+                HoaBangPlantId,
+                sunflowerPrefab,
+                sunflowerPreview,
+                new List<ValueTuple<int, int>> { (1, 10), (10, 1) },
+                0f, 15f, 0, 300, 15f, 200
+            );
+
+            string plantName = "Hướng Dương Băng";
             string plantDescription =
-                "Khi sản xuất ánh nắng sẽ đồng thời đóng băng tất cả zombie trên cùng hàng.\n" + // Dòng tagline
-                "Sản lượng nắng: <color=blue>25 ánh nắng/15 giây</color>\n" + // Dòng sản lượng (dùng màu đỏ)
-                "Công thức: <color=blue>Hoa Hướng Dương + Nấm Băng</color>\n\n" + // Dòng công thức (dùng màu đỏ) - Thêm \n\n để có dòng trống
-                "Hướng Dương Băng kết hợp khả năng sản xuất ánh nắng với sức mạnh của băng, làm đóng băng tất cả zombie trên cùng hàng trong 5 giây, giúp làm chậm tiến độ của kẻ địch và tạo thời gian cho các cây khác tấn công."; // Phần mô tả lore
+                "Khi sản xuất ánh nắng sẽ đồng thời đóng băng tất cả zombie trên cùng hàng.\n" +
+                "Sản lượng nắng: <color=blue>25 ánh nắng/15 giây</color>\n" +
+                "Công thức: <color=blue>Hoa Hướng Dương + Nấm Băng</color>\n\n" +
+                "Hướng Dương Băng kết hợp khả năng sản xuất ánh nắng với sức mạnh của băng, làm đóng băng tất cả zombie trên cùng hàng trong 5 giây, giúp làm chậm tiến độ của kẻ địch và tạo thời gian cho các cây khác tấn công.";
 
             CustomCore.AddPlantAlmanacStrings(HoaBangPlantId, plantName, plantDescription);
         }
- 
+
         // --- PATCH MỚI: ĐÓNG BĂNG ZOMBIE KHI ICESUNFLOWER TẠO SUN ---
         [HarmonyPatch(typeof(Producer), "ProduceSun")] // Patch vào cùng hàm
         public static class IceSunflower_ProduceSun_FreezeZombies_Patch

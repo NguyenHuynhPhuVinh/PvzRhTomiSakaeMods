@@ -432,7 +432,7 @@
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="COPY &quot;$(TargetPath)&quot; &quot;C:\Users\tomis\Documents\PvzRhTomiSakaeMods-main\pvzVI\Mods&quot;" />
+		<Exec Command="COPY &quot;$(TargetPath)&quot; &quot;C:\Users\tomis\Documents\PvzRhTomiSakaeMods-main\mods&quot;" />
 	</Target>
 
 </Project>

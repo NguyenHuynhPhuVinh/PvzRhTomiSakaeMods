@@ -2,11 +2,10 @@
 //             THƯ VIỆN UI CHỌN CÂY CHO MOD
 // =======================================================
 // File: ModPlantSelectorLib.cs
-// Version: 1.3.1 (Fix: Tìm template sớm, hỗ trợ layout riêng)
+// Version: 1.3.2 (Fix for Game v3.0.1)
 // Author: YourName (Thay bằng tên bạn)
-// Description: Cung cấp UI chọn cây riêng cho các mod, tìm template sớm hơn,
-//              hỗ trợ cấu hình template và offset (X, Y) riêng lẻ,
-//              và sửa lỗi vị trí thẻ khi bỏ chọn.
+// Description: Cung cấp UI chọn cây riêng cho các mod, tương thích với game v3.0.1+.
+//              Sửa lỗi chữ ký hàm RemoveCardFromBank và các thay đổi liên quan đến CardUI.
 // =======================================================
 
 // =======================================================
@@ -33,7 +32,7 @@ using Il2CppSystem; // Cần cho Action
 // =======================================================
 //                       THUỘC TÍNH ASSEMBLY
 // =======================================================
-[assembly: MelonInfo(typeof(GiaoDienTuyChinh.Core), "PvzRhTomiSakaeMods v1.0 - GiaoDienTuyChinh", "1.0.0", "TomiSakae", null)]
+[assembly: MelonInfo(typeof(GiaoDienTuyChinh.Core), "PvzRhTomiSakaeMods v1.1 - GiaoDienTuyChinh", "1.1.0", "TomiSakae", null)]
 [assembly: MelonGame("LanPiaoPiao", "PlantsVsZombiesRH")]
 [assembly: MelonPriority(1000)]
 
@@ -49,19 +48,19 @@ namespace GiaoDienTuyChinh
     {
         public override void OnInitializeMelon()
         {
-            MelonLogger.Msg("Thư viện Mod GiaoDienTuyChinh đã khởi tạo (v1.0.0).");
+            MelonLogger.Msg("Thư viện Mod GiaoDienTuyChinh đã khởi tạo (v1.1.0).");
         }
     }
 
     // =======================================================
-    //              STRUCT LƯU THÔNG TIN CÂY MOD (Giữ nguyên từ 1.3.0)
+    //              STRUCT LƯU THÔNG TIN CÂY MOD
     // =======================================================
     public struct ModPlantInfo
     {
         public int PlantId;
         public string PlantName;
         public Sprite SeedPacketSprite;
-        public string TemplateObjectName; // Tên template mong muốn (có thể null -> dùng mặc định)
+        public string TemplateObjectName;
         public float ContentOffsetX;
         public float ContentOffsetY;
     }

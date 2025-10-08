@@ -228,7 +228,6 @@ namespace HoaCopy
                     droppedCard.isAvailable = true;
                     droppedCard.isPickUp = false;
                     droppedCard.movingWay = 0;
-                    droppedCard.thisUI = InGameUI.Instance;
 
                     try { Lawnf.ChangeCardSprite(consumedType, droppedCardGO); }
                     catch (Exception ex) { MelonLogger.Error($"[HoaCopy] Lỗi khi gọi Lawnf.ChangeCardSprite: {ex}"); }

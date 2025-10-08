@@ -455,30 +455,25 @@ namespace GiaoDienTuyChinh
         /// Yêu cầu game bỏ chọn các thẻ cây mod đang nằm trong khay hạt giống.
         /// </summary>
         private static void DeselectActiveModCards()
-        { /* ... Giữ nguyên ... */
+        {
             System.Collections.Generic.List<int> plantsToDeselect = new System.Collections.Generic.List<int>();
-            // Sử dụng List<T> của Il2CppSystem vì cardOnBank là kiểu đó
             var currentBank = InGameUI.Instance?.cardOnBank;
+
             if (currentBank != null)
             {
                 foreach (var kvp in modSlotInteractableCards)
                 {
-                    if (kvp.Value != null)
+                    if (kvp.Value == null) continue;
+                    
+                    // Dùng GetInstanceID() để so sánh, an toàn hơn
+                    int cardInstanceId = kvp.Value.GetInstanceID();
+                    
+                    for (int i = 0; i < currentBank.Count; i++)
                     {
-                        // Cần duyệt qua Il2CppSystem.Collections.Generic.List
-                        bool found = false;
-                        for (int i = 0; i < currentBank.Count; i++)
-                        {
-                            if (currentBank[i] != null && currentBank[i].GetInstanceID() == kvp.Value.GetInstanceID())
-                            {
-                                found = true;
-                                break;
-                            }
-                        }
-
-                        if (found)
+                        if (currentBank[i] != null && currentBank[i].gameObject.GetInstanceID() == cardInstanceId)
                         {
                             plantsToDeselect.Add(kvp.Key);
+                            break; 
                         }
                     }
                 }
@@ -490,11 +485,19 @@ namespace GiaoDienTuyChinh
             {
                 if (modSlotInteractableCards.TryGetValue(plantId, out GameObject cardToDeselect))
                 {
-                    // MelonLogger.Msg($"[Deselect] Yêu cầu game bỏ chọn thẻ của cây ID {plantId} khỏi bank.");
                     try
                     {
-                        InGameUI.Instance.RemoveCardFromBank(cardToDeselect);
-                        deselectedCount++;
+                        // SỬA Ở ĐÂY: Lấy component CardUI trước khi gọi hàm
+                        var cardUIComponent = cardToDeselect.GetComponent<CardUI>();
+                        if (cardUIComponent != null)
+                        {
+                            InGameUI.Instance.RemoveCardFromBank(cardUIComponent);
+                            deselectedCount++;
+                        }
+                        else
+                        {
+                            MelonLogger.Warning($"[Deselect] Không tìm thấy CardUI component trên thẻ của cây ID {plantId}.");
+                        }
                     }
                     catch (System.Exception ex) { MelonLogger.Error($"[Deselect] Lỗi khi gọi RemoveCardFromBank cho ID {plantId}: {ex}"); }
                 }

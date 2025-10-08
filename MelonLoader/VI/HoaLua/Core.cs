@@ -4,7 +4,6 @@ using Il2Cpp;
 using Il2CppInterop.Runtime.Injection;
 using MelonLoader;
 using UnityEngine;
-using GiaoDienTuyChinh;
 
 [assembly: MelonInfo(typeof(HoaLua.Core), "PvzRhTomiSakaeMods v1.0 - HoaLua", "1.0.0", "TomiSakae", null)]
 [assembly: MelonGame("LanPiaoPiao", "PlantsVsZombiesRH")]

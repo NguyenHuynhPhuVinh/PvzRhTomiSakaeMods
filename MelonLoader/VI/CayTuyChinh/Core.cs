@@ -1,4 +1,5 @@
-﻿using CayTuyChinh;
+﻿// CayTuyChinh/Core.cs - ĐÃ SỬA LỖI
+using CayTuyChinh;
 using HarmonyLib;
 using Il2CppInterop.Runtime;
 using Il2CppTMPro;
@@ -192,8 +193,9 @@ namespace CayTuyChinh
             }
             foreach (var z in CustomCore.CustomZombies)
             {
-                GameAPP.zombiePrefab[z.Key] = z.Value.Item1;
-                GameAPP.zombiePrefab[z.Key].tag = "Zombie";
+                GameAPP.resourcesManager.zombiePrefabs[(ZombieType)z.Key] = z.Value.Item1;
+                GameAPP.resourcesManager.zombiePrefabs[(ZombieType)z.Key].tag = "Zombie";
+                GameAPP.resourcesManager.allZombieTypes.Add((ZombieType)z.Key);
             }
             foreach (var bullet in CustomCore.CustomBullets)
             {
@@ -202,7 +204,7 @@ namespace CayTuyChinh
             }
             foreach (var par in CustomCore.CustomParticles)
             {
-                GameAPP.particlePrefab[par.Key] = par.Value;
+                // GameAPP.particlePrefab bị xóa, chỉ cần dùng resourcesManager
                 GameAPP.resourcesManager.particlePrefabs[(ParticleType)par.Key] = par.Value;
                 GameAPP.resourcesManager.allParticles.Add((ParticleType)par.Key);
             }
@@ -226,7 +228,7 @@ namespace CayTuyChinh
 
                 if (Board.Instance.theMoney < cost)
                 {
-                    InGameText.Instance.ShowText($"������Ҫ{cost}���", 5);
+                    InGameText.Instance.ShowText($"需要{cost}金钱", 5);
                     return false;
                 }
                 if (plant.SuperSkill())
@@ -290,113 +292,20 @@ namespace CayTuyChinh
         }
     }
 
+    // Đã comment out toàn bộ code liên quan đến Travel
+    /*
     [HarmonyPatch(typeof(TravelBuff))]
-    public static class TravelBuffPatch
-    {
-        [HarmonyPrefix]
-        [HarmonyPatch("ChangeSprite")]
-        public static void PreChangeSprite(TravelBuff __instance)
-        {
-            if (__instance.theBuffType == 1 && CustomCore.CustomAdvancedBuffs.ContainsKey(__instance.theBuffNumber))
-            {
-                __instance.thePlantType = CustomCore.CustomAdvancedBuffs[__instance.theBuffNumber].Item1;
-            }
-            if (__instance.theBuffType == 2 && CustomCore.CustomUltimateBuffs.ContainsKey(__instance.theBuffNumber))
-            {
-                __instance.thePlantType = CustomCore.CustomUltimateBuffs[__instance.theBuffNumber].Item1;
-            }
-        }
-    }
+    public static class TravelBuffPatch { }
 
     [HarmonyPatch(typeof(TravelMenuMgr))]
-    public static class TravelMenuMgrPatch
-    {
-        [HarmonyPostfix]
-        [HarmonyPatch("SetText")]
-        public static void PostSetText(TravelMenuMgr __instance)
-        {
-            for (int i = 0; i < 3; i++)
-            {
-                int type = __instance.options[i].optionType;
-                int number = __instance.options[i].optionNumber;
-                if (type is 1 && CustomCore.CustomAdvancedBuffs.ContainsKey(number) && CustomCore.CustomAdvancedBuffs[number].Item5 is not null)
-                {
-                    __instance.textMesh[i].text = $"<color={CustomCore.CustomAdvancedBuffs[number].Item5}>{__instance.textMesh[i].text}</color>";
-                }
-                if (type is 2 && CustomCore.CustomUltimateBuffs.ContainsKey(number) && CustomCore.CustomUltimateBuffs[number].Item4 is not null)
-                {
-                    __instance.textMesh[i].text = $"<color={CustomCore.CustomUltimateBuffs[number].Item4}>{__instance.textMesh[i].text}</color>";
-                }
-            }
-        }
-    }
+    public static class TravelMenuMgrPatch { }
 
     [HarmonyPatch(typeof(TravelMgr))]
-    public static class TravelMgrPatch
-    {
-        [HarmonyPatch("Awake")]
-        [HarmonyPrefix]
-        public static void PostAwake(TravelMgr __instance)
-        {
-            if (CustomCore.CustomAdvancedBuffs.Count > 0)
-            {
-                bool[] newAdv = new bool[__instance.advancedUpgrades.Count + CustomCore.CustomAdvancedBuffs.Count];
-                int[] newAdvUnlock = new int[__instance.advancedUnlockRound.Count + CustomCore.CustomAdvancedBuffs.Count];
-                Array.Copy(__instance.advancedUpgrades, newAdv, __instance.advancedUpgrades.Length);
-                Array.Copy(__instance.advancedUnlockRound, newAdvUnlock, __instance.advancedUnlockRound.Length);
-                __instance.advancedUpgrades = newAdv;
-                __instance.advancedUnlockRound = newAdvUnlock;
-            }
-            if (CustomCore.CustomUltimateBuffs.Count > 0)
-            {
-                bool[] newUlti = new bool[__instance.ultimateUpgrades.Count + CustomCore.CustomUltimateBuffs.Count];
-                Array.Copy(__instance.ultimateUpgrades, newUlti, __instance.ultimateUpgrades.Length);
-                __instance.ultimateUpgrades = newUlti;
-            }
-            if (CustomCore.CustomDebuffs.Count > 0)
-            {
-                bool[] newdeb = new bool[__instance.debuff.Count + CustomCore.CustomDebuffs.Count];
-                Array.Copy(__instance.debuff, newdeb, __instance.debuff.Length);
-                __instance.debuff = newdeb;
-            }
-        }
-
-        [HarmonyPatch("GetAdvancedBuffPool")]
-        [HarmonyPostfix]
-        public static void PostGetAdvancedBuffPool(TravelMgr __instance, ref Il2CppSystem.Collections.Generic.List<int> __result)
-        {
-            for (int i = __result.Count - 1; i >= 0; i--)
-            {
-                if (CustomCore.CustomAdvancedBuffs.ContainsKey(__result[i]) && !CustomCore.CustomAdvancedBuffs[__result[i]].Item3())
-                {
-                    __result.Remove(__result[i]);
-                }
-            }
-        }
-    }
+    public static class TravelMgrPatch { }
 
     [HarmonyPatch(typeof(TravelStore))]
-    public static class TravelStorePatch
-    {
-        [HarmonyPatch("RefreshBuff")]
-        [HarmonyPostfix]
-        public static void PostRefreshBuff(TravelStore __instance)
-        {
-            foreach (var travelBuff in __instance.gameObject.GetComponentsInChildren<TravelBuff>())
-            {
-                if (travelBuff.theBuffType is (int)BuffType.AdvancedBuff && CustomCore.CustomAdvancedBuffs.ContainsKey(travelBuff.theBuffNumber))
-                {
-                    travelBuff.cost = CustomCore.CustomAdvancedBuffs[travelBuff.theBuffNumber].Item4;
-                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = $"��{CustomCore.CustomAdvancedBuffs[travelBuff.theBuffNumber].Item4}";
-                }
-                if (travelBuff.theBuffType is (int)BuffType.UltimateBuff && CustomCore.CustomUltimateBuffs.ContainsKey(travelBuff.theBuffNumber))
-                {
-                    travelBuff.cost = CustomCore.CustomUltimateBuffs[travelBuff.theBuffNumber].Item3;
-                    travelBuff.transform.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = $"��{CustomCore.CustomUltimateBuffs[travelBuff.theBuffNumber].Item4}";
-                }
-            }
-        }
-    }
+    public static class TravelStorePatch { }
+    */
 
     [HarmonyPatch(typeof(TypeMgr))]
     public static class TypeMgrPatch
@@ -769,36 +678,6 @@ namespace CayTuyChinh
             }
         }
 
-        public static int RegisterCustomBuff(string text, BuffType buffType, Func<bool> canUnlock, int cost, string? color = null, PlantType plantType = PlantType.Nothing)
-        {
-            switch (buffType)
-            {
-                case BuffType.AdvancedBuff:
-                    {
-                        int i = TravelMgr.advancedBuffs.Count;
-                        CustomAdvancedBuffs.Add(i, (plantType, text, canUnlock, cost, color));
-                        TravelMgr.advancedBuffs.Add(i, text);
-                        return i;
-                    }
-                case BuffType.UltimateBuff:
-                    {
-                        int i = TravelMgr.ultimateBuffs.Count;
-                        CustomUltimateBuffs.Add(i, (plantType, text, cost, color));
-                        TravelMgr.ultimateBuffs.Add(i, text);
-                        return i;
-                    }
-                case BuffType.Debuff:
-                    {
-                        int i = TravelMgr.debuffs.Count;
-                        CustomDebuffs.Add(i, text);
-                        TravelMgr.debuffs.Add(i, text);
-                        return i;
-                    }
-                default:
-                    return -1;
-            }
-        }
-
         public static void RegisterCustomBullet<TBullet>(int id, GameObject bulletPrefab) where TBullet : Bullet
         {
             if (!CustomBullets.ContainsKey((BulletType)id))
@@ -919,7 +798,7 @@ namespace CayTuyChinh
             zombie.AddComponent<TBase>().theZombieType = (ZombieType)id;
             zombie.AddComponent<TClass>();
 
-            ZombieData.zombieData[id] = new()
+            ZombieDataManager.zombieDataDic[(ZombieType)id] = new ZombieDataManager.ZombieData()
             {
                 theAttackDamage = theAttackDamage,
                 theFirstArmorMaxHealth = theFirstArmorMaxHealth,
@@ -932,16 +811,13 @@ namespace CayTuyChinh
 
         public static void RegisterSuperSkill([NotNull] int id, [NotNull] Func<Plant, int> cost, [NotNull] Action<Plant> skill) => SuperSkills.Add((PlantType)id, (cost, skill));
 
-        public static Dictionary<int, (PlantType, string, Func<bool>, int, string?)> CustomAdvancedBuffs { get; set; } = [];
         public static Dictionary<BulletType, GameObject> CustomBullets { get; set; } = [];
-        public static Dictionary<int, string> CustomDebuffs { get; set; } = [];
         public static List<(int, int, int)> CustomFusions { get; set; } = [];
         public static Dictionary<int, GameObject> CustomParticles { get; set; } = [];
         public static Dictionary<PlantType, Action<Plant>> CustomPlantClicks { get; set; } = [];
         public static Dictionary<PlantType, CustomPlantData> CustomPlants { get; set; } = [];
         public static List<PlantType> CustomPlantTypes { get; set; } = [];
         public static Dictionary<int, Sprite> CustomSprites { get; set; } = [];
-        public static Dictionary<int, (PlantType, string, int, string?)> CustomUltimateBuffs { get; set; } = [];
         public static Dictionary<(PlantType, BucketType), Action<Plant>> CustomUseItems { get; set; } = [];
         public static Dictionary<int, (GameObject, int)> CustomZombies { get; set; } = [];
         public static List<ZombieType> CustomZombieTypes { get; set; } = [];

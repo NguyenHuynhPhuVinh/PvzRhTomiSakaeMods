@@ -1,12 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
 
-	  <LangVersion>12.0</LangVersion>
-  </PropertyGroup>
+		<LangVersion>12.0</LangVersion>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<Reference Include="0Harmony">
@@ -26,6 +26,9 @@
 		</Reference>
 		<Reference Include="Assembly-CSharp">
 			<HintPath>..\..\..\pvzVI\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
+		</Reference>
+		<Reference Include="AssetRipper.Primitives">
+			<HintPath>..\..\..\pvzVI\MelonLoader\net6\AssetRipper.Primitives.dll</HintPath>
 		</Reference>
 		<Reference Include="AssetRipper.VersionUtilities">
 			<HintPath>..\..\..\pvzVI\MelonLoader\net6\AssetRipper.VersionUtilities.dll</HintPath>
@@ -168,6 +171,12 @@
 		<Reference Include="Unity.2D.Animation.Runtime">
 			<HintPath>..\..\..\pvzVI\MelonLoader\Il2CppAssemblies\Unity.2D.Animation.Runtime.dll</HintPath>
 		</Reference>
+		<Reference Include="Unity.2D.Common.Runtime">
+			<HintPath>..\..\..\pvzVI\MelonLoader\Il2CppAssemblies\Unity.2D.Common.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.2D.SpriteShape.Runtime">
+			<HintPath>..\..\..\pvzVI\MelonLoader\Il2CppAssemblies\Unity.2D.SpriteShape.Runtime.dll</HintPath>
+		</Reference>
 		<Reference Include="Unity.2D.Tilemap.Extras">
 			<HintPath>..\..\..\pvzVI\MelonLoader\Il2CppAssemblies\Unity.2D.Tilemap.Extras.dll</HintPath>
 		</Reference>
@@ -188,6 +197,9 @@
 		</Reference>
 		<Reference Include="Unity.Mathematics">
 			<HintPath>..\..\..\pvzVI\MelonLoader\Il2CppAssemblies\Unity.Mathematics.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.MemoryProfiler">
+			<HintPath>..\..\..\pvzVI\MelonLoader\Il2CppAssemblies\Unity.MemoryProfiler.dll</HintPath>
 		</Reference>
 		<Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
 			<HintPath>..\..\..\pvzVI\MelonLoader\Il2CppAssemblies\Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>
@@ -411,7 +423,7 @@
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="COPY &quot;$(TargetPath)&quot; &quot;C:\Users\kotor\Documents\pvzRhTomiSakaeMods\pvzVI\Mods&quot;" />
+		<Exec Command="COPY &quot;$(TargetPath)&quot; &quot;C:\Users\tomis\Documents\PvzRhTomiSakaeMods-main\pvzVI\Mods&quot;" />
 	</Target>
-	
+
 </Project>

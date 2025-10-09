@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -46,6 +46,9 @@
 		</Reference>
 		<Reference Include="bHapticsLib">
 			<HintPath>..\..\..\pvzVI\MelonLoader\net6\bHapticsLib.dll</HintPath>
+		</Reference>
+		<Reference Include="CustomizeLib.MelonLoader">
+		  <HintPath>..\..\..\..\..\Downloads\SniperDLC MelonLoader 3.0\Mods\CustomizeLib.MelonLoader.dll</HintPath>
 		</Reference>
 		<Reference Include="Iced">
 			<HintPath>..\..\..\pvzVI\MelonLoader\net6\Iced.dll</HintPath>

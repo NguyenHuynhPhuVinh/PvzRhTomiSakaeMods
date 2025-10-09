@@ -1,22 +1,16 @@
-﻿// --- START OF FILE Core.cs --- Của mod HoaCopy
+﻿// --- START OF FILE Core.cs --- Của mod HoaCopy (Đã chỉnh sửa)
 
-using CayTuyChinh;          // Namespace của mod nền (chứa CustomCore)
-using GiaoDienTuyChinh;    // Namespace của thư viện UI
+using CustomizeLib;
+using CustomizeLib.MelonLoader;
 using HarmonyLib;
 using Il2Cpp;
-using Il2CppInterop.Runtime;
 using Il2CppInterop.Runtime.Injection;
-using Il2CppSystem.Collections.Generic; // Sử dụng List của Il2CppSystem
 using Il2CppTMPro;
 using MelonLoader;
-using System;             // Cần cho Exception
-using System.Linq;        // Cần cho FirstOrDefault
-using System.Collections; // Cần cho IEnumerator
-using System.Collections.Generic; // Sử dụng List của System cho các biến cục bộ nếu cần
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.UI;      // Cần cho Image
-using UnityEngine.Rendering; // Cần cho SortingGroup
-using UnityEngine.SceneManagement;
 
 [assembly: MelonInfo(typeof(HoaCopy.Core), "PvzRhTomiSakaeMods v1.1 - HoaCopy", "1.1.0", "TomiSakae", null)]
 [assembly: MelonGame("LanPiaoPiao", "PlantsVsZombiesRH")]
@@ -72,21 +66,23 @@ namespace HoaCopy
     {
         public const int HoaCopyPlantId = 2036;
         internal static GameObject droppedCardPrefab = null;
-        public const float HoaCopyCooldown = 200f; // --- Đặt thời gian hồi chiêu mong muốn ở đây ---
+        public const float HoaCopyCooldown = 200f;
 
         public override void OnInitializeMelon()
         {
-            var ab = CayTuyChinh.CustomCore.GetAssetBundle(MelonAssembly.Assembly, "hoacopy");
-            CayTuyChinh.CustomCore.RegisterCustomPlant<Producer, HoaCopyComponent>(
+            var ab = CustomCore.GetAssetBundle(MelonAssembly.Assembly, "hoacopy");
+
+            // Đăng ký cây tùy chỉnh bằng CustomizeLib
+            CustomCore.RegisterCustomPlant<Producer, HoaCopyComponent>(
                 id: HoaCopyPlantId,
                 prefab: ab.GetAsset<GameObject>("SunflowerPrefab"),
                 preview: ab.GetAsset<GameObject>("SunflowerPreview"),
-                fusions: [],
+                fusions: new List<ValueTuple<int, int>> { (1, 245), (245, 1) }, // Sunflower (1) + Jalapeno (16)
                 attackInterval: 0f,
                 produceInterval: 15f, // Thời gian sản xuất thẻ
                 attackDamage: 0,
                 maxHealth: 300,
-                cd: HoaCopyCooldown, // Sử dụng hằng số đã định nghĩa
+                cd: HoaCopyCooldown,
                 sun: 150
             );
 
@@ -94,21 +90,13 @@ namespace HoaCopy
             string plantDescription =
                 "Sao chép cây trồng lên nó.\n" +
                 "Sản lượng: <color=red>1 thẻ bài/15 giây (nếu có cây sao chép)</color>\n" +
-                $"Thời gian hồi: <color=red>{HoaCopyCooldown} giây</color>\n" + // Hiển thị đúng CD
+                $"Thời gian hồi: <color=red>{HoaCopyCooldown} giây</color>\n" +
                 "Công thức: <color=red>Hoa Hướng Dương + Ớt</color>\n\n" +
                 "Loài hướng dương kỳ lạ này có khả năng phân tích và tái tạo cấu trúc của các loài thực vật khác khi chúng được đặt lên trên. Sau một thời gian, nó sẽ tạo ra một hạt giống của cây đó.";
 
-            CayTuyChinh.CustomCore.AddPlantAlmanacStrings(HoaCopyPlantId, plantName, plantDescription);
+            CustomCore.AddPlantAlmanacStrings(HoaCopyPlantId, plantName, plantDescription);
 
-            ModPlantUISystem.ConfigureButton(text: "Tomi's Plants", anchoredPosition: new Vector2(30, 50));
-            ModPlantUISystem.RegisterModPlant(
-                HoaCopyPlantId,
-                plantName,
-                null,
-                "Sunflower",
-                0f,
-                200f);
-
+            // Đã xóa các dòng gọi ModPlantUISystem
             MelonLogger.Msg($"[HoaCopy] Đã khởi tạo và đăng ký với CD {HoaCopyCooldown} giây.");
         }
 
@@ -141,8 +129,8 @@ namespace HoaCopy
         [HarmonyPatch(typeof(CreatePlant), "SetPlant")]
         public static class CreatePlant_SetPlant_Patch
         {
-            public static bool Prefix(CreatePlant __instance, int newColumn, int newRow, PlantType theSeedType, ref GameObject __result,
-                                     bool isFreeSet = false, bool withEffect = true, Plant movingPlant = null, Vector2 puffV = default)
+            // Chữ ký của hàm Prefix cần khớp với một trong các overload của SetPlant
+            public static bool Prefix(int newColumn, int newRow, PlantType theSeedType, ref GameObject __result, bool isFreeSet, bool withEffect, Plant hitplant)
             {
                 if (Board.Instance == null || theSeedType == PlantType.Nothing)
                 {
@@ -156,7 +144,7 @@ namespace HoaCopy
                     var hoaCopyComponent = existingPlant.GetComponent<HoaCopyComponent>();
                     if (hoaCopyComponent != null)
                     {
-                        // Để game tự trừ tiền
+                        // Để game tự trừ tiền, không cần xử lý ở đây
                         hoaCopyComponent.ConsumePlant(theSeedType);
 
                         if (withEffect && CreatePlant.Instance != null)
@@ -165,6 +153,7 @@ namespace HoaCopy
                             CreatePlant.Instance.CreatePlantParticle(newColumn, newRow, plantWorldPosition);
                         }
 
+                        // Trả về cây HoaCopy hiện có và ngăn hàm gốc trồng cây mới
                         __result = existingPlant.gameObject;
                         return false;
                     }
@@ -245,9 +234,6 @@ namespace HoaCopy
                     }
 
                     droppedCardGO.SetActive(true);
-
-                    // KHÔNG Reset trạng thái
-                    // MelonLogger.Msg($"[HoaCopy] Đã tạo DroppedCard cho {consumedType} (giá 0), sẵn sàng nhặt. Cây tiếp tục sản xuất.");
                 }
             }
         }
@@ -270,7 +256,6 @@ namespace HoaCopy
             }
         }
 
-        // --- SỬA PATCH CardUI.Start ---
         [HarmonyPatch(typeof(CardUI), "Start")]
         public static class CardUI_Start_Patch
         {
@@ -282,10 +267,8 @@ namespace HoaCopy
                     {
                         if (__instance.TryCast<DroppedCard>() == null) // Chỉ áp dụng cho thẻ gốc trong khay
                         {
-                            // Đặt cả fullCD và CD
-                            __instance.fullCD = Core.HoaCopyCooldown; // Lấy giá trị từ hằng số
+                            __instance.fullCD = Core.HoaCopyCooldown;
                             __instance.CD = 0f; // Bắt đầu hồi chiêu từ 0
-                            //MelonLogger.Msg($"[HoaCopy Patch Start] Đã đặt CD=0 và fullCD={__instance.fullCD} cho thẻ HoaCopy trong khay.");
                         }
                     }
                 }
@@ -295,8 +278,6 @@ namespace HoaCopy
                 }
             }
         }
-        // --- KẾT THÚC SỬA PATCH ---
-
-    } // Kết thúc class Core
-} // Kết thúc namespace HoaCopy
-  // --- END OF FILE Core.cs --- Của mod HoaCopy
+    }
+}
+// --- END OF FILE Core.cs ---

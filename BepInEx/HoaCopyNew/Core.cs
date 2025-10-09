@@ -86,7 +86,7 @@ namespace HoaCopy
 
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), null);
 
-            var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "hoacopy");
+            var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "new_sunflower");
 
             CustomCore.RegisterCustomPlant<Producer, HoaCopyComponent>(
                 HoaCopyPlantId,

@@ -376,9 +376,9 @@
       <HintPath>..\..\..\Full Mod 3.0.1\BepInEx\interop\__Generated.dll</HintPath>
     </Reference>
   </ItemGroup>
-
-	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="COPY &quot;$(TargetPath)&quot; &quot;C:\Users\tomis\Documents\PvzRhTomiSakaeMods-main\mods&quot;" />
-	</Target>
 	
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="COPY &quot;$(TargetPath)&quot; &quot;C:\Users\tomis\Documents\Full Mod 3.0.1\BepInEx\plugins&quot;" />
+	</Target>
+
 </Project>

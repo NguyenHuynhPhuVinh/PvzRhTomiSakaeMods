@@ -1,4 +1,4 @@
-﻿// --- START OF FILE Core.cs --- Của mod Peashroom
+﻿// --- START OF FILE Core.cs --- Của mod Peashroom (Sửa lỗi xung đột List và Coroutine)
 
 using BepInEx;
 using BepInEx.Unity.IL2CPP;
@@ -8,13 +8,50 @@ using HarmonyLib;
 using Il2CppInterop.Runtime.Injection;
 using System;
 using System.Collections;
-using System.Collections.Generic;
+using System.Collections.Generic; // Sử dụng List của System cho các biến cục bộ
 using System.Reflection;
 using UnityEngine;
+// Đã xóa "using Il2CppSystem.Collections.Generic;"
 
 namespace Peashroom
 {
-    // Component để định danh cây, không cần logic phức tạp
+    // --- COMPONENT MỚI ĐỂ XỬ LÝ HIỆU ỨNG NHẤP NHÁY ---
+    public class PeashroomEffectController : MonoBehaviour
+    {
+        public PeashroomEffectController(IntPtr ptr) : base(ptr) { }
+
+        private Plant plant;
+        // --- THAY ĐỔI: Chỉ định rõ ràng kiểu List của Il2Cpp ---
+        private Il2CppSystem.Collections.Generic.List<SpriteRenderer> renderers;
+        private float pulseSpeed = 6.0f;
+        private Color originalColor = Color.white;
+        private Color pulseColor = new Color(0.6f, 0.8f, 1.0f);
+
+        void Awake()
+        {
+            plant = GetComponent<Plant>();
+            if (plant != null)
+            {
+                renderers = plant.spriteRenderers;
+            }
+        }
+
+        void Update()
+        {
+            if (renderers == null) return;
+
+            float pulse = (Mathf.Sin(Time.time * pulseSpeed) + 1.0f) / 2.0f;
+            Color currentColor = Color.Lerp(originalColor, pulseColor, pulse);
+
+            foreach (var r in renderers)
+            {
+                if (r != null) r.color = currentColor;
+            }
+        }
+    }
+
+    // Không cần component Activation nữa, chúng ta dùng DelayAction
+
     public class PeashroomComponent : MonoBehaviour
     {
         public PeashroomComponent(IntPtr ptr) : base(ptr) { }
@@ -25,47 +62,34 @@ namespace Peashroom
     {
         public const string PluginGUID = "com.tomisakae.peashroom";
         public const string PluginName = "PvzRhTomiSakaeMods - Peashroom";
-        public const string PluginVersion = "1.0.0";
-
+        public const string PluginVersion = "1.4.2"; // Tăng phiên bản
         public static Core Instance;
-
         public const int PeashroomPlantId = 2039;
+        public const int PeaRainDamageMarker = 21;
 
         public override void Load()
         {
             Instance = this;
-
             ClassInjector.RegisterTypeInIl2Cpp<PeashroomComponent>();
-
+            ClassInjector.RegisterTypeInIl2Cpp<PeashroomEffectController>();
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), null);
 
-            // Đảm bảo tên asset bundle ("peashroom") khớp với file của bạn
             var ab = CustomCore.GetAssetBundle(Assembly.GetExecutingAssembly(), "peashroom");
-
-            // Đăng ký cây mới, kế thừa từ Plant vì nó là cây dùng một lần
             CustomCore.RegisterCustomPlant<Plant, PeashroomComponent>(
-                PeashroomPlantId,
-                ab.GetAsset<GameObject>("IceShroomPrefab"),   // Dùng prefab của IceShroom làm gốc
-                ab.GetAsset<GameObject>("IceShroomPreview"), // Dùng preview của IceShroom làm gốc
-                new List<ValueTuple<int, int>> { (0, 10), (10, 0) }, // Peashooter + IceShroom
-                attackInterval: 0f,
-                produceInterval: 0f,
-                attackDamage: 0,
-                maxHealth: 300,
-                cd: 30f,
-                sun: 175
+                PeashroomPlantId, ab.GetAsset<GameObject>("IceShroomPrefab"),
+                ab.GetAsset<GameObject>("IceShroomPreview"), new List<ValueTuple<int, int>> { (0, 10), (10, 0) },
+                0f, 0f, 0, 300, 30f, 175
             );
 
             string plantName = "Nấm Đậu Băng";
             string plantDescription =
-                "Khi được trồng, nó triệu hồi một cơn mưa đậu hủy diệt từ trên trời.\n" +
-                "Đặc tính: <color=red>Dùng một lần</color>\n" +
+                "Sau một lúc, nó phát sáng rồi triệu hồi một cơn mưa đậu hủy diệt từ trên trời xuống toàn bộ sân.\n" +
+                "Đặc tính: <color=red>Dùng một lần, có độ trễ</color>\n" +
                 "Sát thương: <color=red>Lớn trên một khu vực</color>\n" +
                 "Công thức: <color=red>Đậu Bắn Hạt + Nấm Băng</color>\n\n" +
                 "Kết quả của một thí nghiệm kỳ lạ, Nấm Đậu Băng có thể thay đổi áp suất khí quyển cục bộ, khiến những hạt đậu đặc cứng ngưng tụ và rơi xuống như mưa đá.";
 
             CustomCore.AddPlantAlmanacStrings(PeashroomPlantId, plantName, plantDescription);
-
             Log.LogInfo($"[{PluginName}] Đã khởi tạo và đăng ký.");
         }
 
@@ -79,86 +103,82 @@ namespace Peashroom
                 if (theSeedType != (PlantType)Core.PeashroomPlantId || __result == null) return;
 
                 Plant plant = __result.GetComponent<Plant>();
-                if (plant == null) return;
+                if (plant == null || GameAPP.delayAction == null) return;
 
-                if (Board.Instance == null)
+                __result.AddComponent<PeashroomEffectController>();
+                Instance.Log.LogInfo("Peashroom đã được trồng. Bắt đầu đếm ngược và hiệu ứng...");
+
+                float delay = 1.2f;
+
+                Action activationAction = () =>
                 {
-                    Instance.Log.LogError("Không thể bắt đầu Coroutine vì Board.Instance là null!");
-                    return;
-                }
+                    if (Board.Instance != null && plant != null)
+                    {
+                        // --- THAY ĐỔI: Chỉ tạo hiệu ứng hình ảnh, không gây đóng băng ---
+                        // CreateParticle.SetParticle(particleType, position, row, setLayer)
+                        // ParticleType.IceDoomSplat (28) là hiệu ứng nổ băng
+                        CreateParticle.SetParticle((int)ParticleType.IceDoomSplat, plant.transform.position, plant.thePlantRow, true);
 
-                Instance.Log.LogInfo($"Peashroom được trồng tại ({plant.thePlantColumn}, {plant.thePlantRow}). Kích hoạt mưa đậu!");
+                        var rainRoutine = SummonPeaRain();
+                        Board.Instance.StartCoroutine(rainRoutine);
+                    }
 
-                Board.Instance.StartCoroutine(SummonPeaRain(plant));
+                    if (plant != null)
+                    {
+                        plant.Die(Plant.DieReason.BySelf);
+                    }
+                };
 
-                plant.Die(Plant.DieReason.BySelf);
+                GameAPP.delayAction.SetAction(activationAction, delay);
             }
 
-            public static IEnumerator SummonPeaRain(Plant sourcePlant)
+            public static IEnumerator SummonPeaRain()
             {
-                if (Board.Instance == null)
-                {
-                    Instance.Log.LogError("[Mưa Đậu] Board.Instance là null.");
-                    yield break;
-                }
-                if (CreateBullet.Instance == null)
-                {
-                    Instance.Log.LogError("[Mưa Đậu] CreateBullet.Instance là null.");
-                    yield break;
-                }
-
-                // --- THAY ĐỔI CÁC THÔNG SỐ ĐỂ DỄ DEBUG HƠN ---
-                int peaCount = 20;
-                float duration = 1.5f;
-                int damagePerPea = 20;
-                float fallSpeed = 8.0f; // Tăng tốc độ rơi một chút
-                int targetRow = sourcePlant.thePlantRow;
-
-                // Giảm Y một chút để đảm bảo trong tầm nhìn
+                // ... (Logic tạo mưa giữ nguyên) ...
+                if (Board.Instance == null || CreateBullet.Instance == null) yield break;
+                int peasPerLane = 8, totalLanes = Board.Instance.rowNum;
+                int totalPeas = peasPerLane * totalLanes;
+                float duration = 2.0f;
                 float spawnY = Board.Instance.boardMaxY + 1.0f;
-                float minX = Board.Instance.boardMinX + 1.0f; // Bỏ qua rìa màn hình
-                float maxX = Board.Instance.boardMaxX - 1.0f;
-
-                Instance.Log.LogInfo($"[Mưa Đậu] Bắt đầu tạo mưa. Khu vực X: [{minX}, {maxX}], Y: {spawnY}");
-
-                for (int i = 0; i < peaCount; i++)
+                float minX = Board.Instance.boardMinX, maxX = Board.Instance.boardMaxX;
+                for (int i = 0; i < totalPeas; i++)
                 {
                     try
                     {
+                        int randomRow = UnityEngine.Random.Range(0, totalLanes);
                         float spawnX = UnityEngine.Random.Range(minX, maxX);
-
-                        // Sử dụng MoveRight, một trong những chế độ đáng tin cậy nhất
-                        Bullet bullet = CreateBullet.Instance.SetBullet(spawnX, spawnY, targetRow, BulletType.Bullet_pea, (int)BulletMoveWay.MoveRight, false);
-
-                        // --- THÊM DEBUG LOG ---
-                        if (bullet == null)
+                        Bullet bullet = CreateBullet.Instance.SetBullet(spawnX, spawnY, randomRow, BulletType.Bullet_pea, (int)BulletMoveWay.Free, false);
+                        if (bullet != null)
                         {
-                            Instance.Log.LogError($"[Mưa Đậu] Lỗi: CreateBullet.SetBullet trả về null ở lần lặp thứ {i + 1}!");
-                            continue; // Bỏ qua lần lặp này và tiếp tục
+                            bullet.Damage = Core.PeaRainDamageMarker;
+                            bullet.Vx = 2.5f; // --- THAY ĐỔI: Vận tốc X cố định dương ---
                         }
-
-                        if (bullet.rb == null)
-                        {
-                            Instance.Log.LogError($"[Mưa Đậu] Lỗi: Rigidbody2D (rb) trên viên đạn là null!");
-                            continue;
-                        }
-
-                        // Ghi đè vận tốc để rơi thẳng xuống
-                        bullet.rb.velocity = new Vector2(0, -fallSpeed);
-                        bullet.Damage = damagePerPea;
-                        //Instance.Log.LogInfo($"[Mưa Đậu] Đã tạo hạt đậu thứ {i+1} tại ({spawnX:F2}, {spawnY:F2})");
                     }
-                    catch (Exception ex)
-                    {
-                        Instance.Log.LogError($"[Mưa Đậu] Lỗi khi tạo hạt đậu: {ex.Message}");
-                    }
-
-                    yield return new WaitForSeconds(duration / peaCount);
+                    catch (Exception ex) { Instance.Log.LogError($"[Mưa Đậu] Lỗi khi tạo hạt đậu: {ex.Message}"); }
+                    yield return new WaitForSeconds(duration / totalPeas);
                 }
-                Instance.Log.LogInfo("[Mưa Đậu] Đã kết thúc coroutine.");
+            }
+        }
+
+        [HarmonyPatch(typeof(Bullet), nameof(Bullet.FixedUpdate))]
+        public static class Bullet_FixedUpdate_Patch
+        {
+            public static bool Prefix(Bullet __instance)
+            {
+                if (__instance != null && __instance.Damage == Core.PeaRainDamageMarker)
+                {
+                    if (__instance.rb != null)
+                    {
+                        // Vận tốc Y không đổi, vận tốc X đọc từ giá trị đã lưu (bây giờ là cố định)
+                        __instance.rb.velocity = new Vector2(__instance.Vx, -8.0f);
+                    }
+                    if (__instance.transform.position.y < Board.Instance.boardMinY - 1.0f) __instance.Die();
+                    return false;
+                }
+                return true;
             }
         }
 
         #endregion
-    }
+}
 }

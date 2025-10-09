@@ -29,6 +29,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BepInEx", "BepInEx", "{3726
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DoomSunJala", "BepInEx\DoomSunJala\DoomSunJala.csproj", "{DC4DB03B-3C50-4147-8985-309B10AEE594}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Peashroom", "BepInEx\Peashroom\Peashroom.csproj", "{7FFBC529-CE88-460A-866E-E7CF67C1B687}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,6 +77,10 @@ Global
 		{DC4DB03B-3C50-4147-8985-309B10AEE594}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DC4DB03B-3C50-4147-8985-309B10AEE594}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DC4DB03B-3C50-4147-8985-309B10AEE594}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FFBC529-CE88-460A-866E-E7CF67C1B687}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FFBC529-CE88-460A-866E-E7CF67C1B687}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FFBC529-CE88-460A-866E-E7CF67C1B687}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FFBC529-CE88-460A-866E-E7CF67C1B687}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -91,6 +97,7 @@ Global
 		{E0F6E3FD-D6C1-41C5-8161-1E982DE3E8BB} = {F2E934EA-5B01-408A-B5B0-B8881642ECF4}
 		{23C97071-6F36-4595-AC57-B33CCFA3F623} = {37264778-A690-4B0D-8A2A-2195BA6025D2}
 		{DC4DB03B-3C50-4147-8985-309B10AEE594} = {37264778-A690-4B0D-8A2A-2195BA6025D2}
+		{7FFBC529-CE88-460A-866E-E7CF67C1B687} = {37264778-A690-4B0D-8A2A-2195BA6025D2}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {ECE623FC-9C46-4C8D-9751-2FB4D7CB1CA2}

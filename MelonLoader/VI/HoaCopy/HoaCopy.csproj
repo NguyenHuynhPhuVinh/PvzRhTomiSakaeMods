@@ -35,6 +35,9 @@
 		<Reference Include="Assembly-CSharp">
 			<HintPath>..\..\..\pvzVI\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
 		</Reference>
+		<Reference Include="AssetRipper.CIL">
+		  <HintPath>..\..\..\..\Full Mod 3.0.1\BepInEx\core\AssetRipper.CIL.dll</HintPath>
+		</Reference>
 		<Reference Include="AssetRipper.Primitives">
 			<HintPath>..\..\..\pvzVI\MelonLoader\net6\AssetRipper.Primitives.dll</HintPath>
 		</Reference>
@@ -44,11 +47,35 @@
 		<Reference Include="AssetsTools.NET">
 			<HintPath>..\..\..\pvzVI\MelonLoader\net6\AssetsTools.NET.dll</HintPath>
 		</Reference>
+		<Reference Include="BepInEx.Core">
+		  <HintPath>..\..\..\..\Full Mod 3.0.1\BepInEx\core\BepInEx.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="BepInEx.Preloader.Core">
+		  <HintPath>..\..\..\..\Full Mod 3.0.1\BepInEx\core\BepInEx.Preloader.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="BepInEx.Unity.Common">
+		  <HintPath>..\..\..\..\Full Mod 3.0.1\BepInEx\core\BepInEx.Unity.Common.dll</HintPath>
+		</Reference>
+		<Reference Include="BepInEx.Unity.IL2CPP">
+		  <HintPath>..\..\..\..\Full Mod 3.0.1\BepInEx\core\BepInEx.Unity.IL2CPP.dll</HintPath>
+		</Reference>
 		<Reference Include="bHapticsLib">
 			<HintPath>..\..\..\pvzVI\MelonLoader\net6\bHapticsLib.dll</HintPath>
 		</Reference>
+		<Reference Include="Cpp2IL.Core">
+		  <HintPath>..\..\..\..\Full Mod 3.0.1\BepInEx\core\Cpp2IL.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="CustomizeLib.BepInEx">
+		  <HintPath>..\..\..\..\Full Mod 3.0.1\BepInEx\plugins\CustomizeLib.BepInEx.dll</HintPath>
+		</Reference>
 		<Reference Include="CustomizeLib.MelonLoader">
 		  <HintPath>..\..\..\..\..\Downloads\SniperDLC MelonLoader 3.0\Mods\CustomizeLib.MelonLoader.dll</HintPath>
+		</Reference>
+		<Reference Include="Disarm">
+		  <HintPath>..\..\..\..\Full Mod 3.0.1\BepInEx\core\Disarm.dll</HintPath>
+		</Reference>
+		<Reference Include="Gee.External.Capstone">
+		  <HintPath>..\..\..\..\Full Mod 3.0.1\BepInEx\core\Gee.External.Capstone.dll</HintPath>
 		</Reference>
 		<Reference Include="Iced">
 			<HintPath>..\..\..\pvzVI\MelonLoader\net6\Iced.dll</HintPath>
@@ -88,6 +115,9 @@
 		</Reference>
 		<Reference Include="IndexRange">
 			<HintPath>..\..\..\pvzVI\MelonLoader\net6\IndexRange.dll</HintPath>
+		</Reference>
+		<Reference Include="LibCpp2IL">
+		  <HintPath>..\..\..\..\Full Mod 3.0.1\BepInEx\core\LibCpp2IL.dll</HintPath>
 		</Reference>
 		<Reference Include="MelonLoader">
 			<HintPath>..\..\..\pvzVI\MelonLoader\net6\MelonLoader.dll</HintPath>
@@ -160,6 +190,12 @@
 		</Reference>
 		<Reference Include="Newtonsoft.Json">
 			<HintPath>..\..\..\pvzVI\MelonLoader\net6\Newtonsoft.Json.dll</HintPath>
+		</Reference>
+		<Reference Include="SemanticVersioning">
+		  <HintPath>..\..\..\..\Full Mod 3.0.1\BepInEx\core\SemanticVersioning.dll</HintPath>
+		</Reference>
+		<Reference Include="StableNameDotNet">
+		  <HintPath>..\..\..\..\Full Mod 3.0.1\BepInEx\core\StableNameDotNet.dll</HintPath>
 		</Reference>
 		<Reference Include="System.Configuration.ConfigurationManager">
 			<HintPath>..\..\..\pvzVI\MelonLoader\net6\System.Configuration.ConfigurationManager.dll</HintPath>
@@ -253,6 +289,12 @@
 		</Reference>
 		<Reference Include="UnityEngine.ClothModule">
 			<HintPath>..\..\..\pvzVI\MelonLoader\Il2CppAssemblies\UnityEngine.ClothModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.ClusterInputModule">
+		  <HintPath>..\..\..\..\Full Mod 3.0.1\BepInEx\interop\UnityEngine.ClusterInputModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.ClusterRendererModule">
+		  <HintPath>..\..\..\..\Full Mod 3.0.1\BepInEx\interop\UnityEngine.ClusterRendererModule.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine.ContentLoadModule">
 			<HintPath>..\..\..\pvzVI\MelonLoader\Il2CppAssemblies\UnityEngine.ContentLoadModule.dll</HintPath>
@@ -419,6 +461,9 @@
 		<Reference Include="UnityEngine.VideoModule">
 			<HintPath>..\..\..\pvzVI\MelonLoader\Il2CppAssemblies\UnityEngine.VideoModule.dll</HintPath>
 		</Reference>
+		<Reference Include="UnityEngine.VirtualTexturingModule">
+		  <HintPath>..\..\..\..\Full Mod 3.0.1\BepInEx\interop\UnityEngine.VirtualTexturingModule.dll</HintPath>
+		</Reference>
 		<Reference Include="UnityEngine.VRModule">
 			<HintPath>..\..\..\pvzVI\MelonLoader\Il2CppAssemblies\UnityEngine.VRModule.dll</HintPath>
 		</Reference>
@@ -428,8 +473,14 @@
 		<Reference Include="UnityEngine.XRModule">
 			<HintPath>..\..\..\pvzVI\MelonLoader\Il2CppAssemblies\UnityEngine.XRModule.dll</HintPath>
 		</Reference>
+		<Reference Include="WasmDisassembler">
+		  <HintPath>..\..\..\..\Full Mod 3.0.1\BepInEx\core\WasmDisassembler.dll</HintPath>
+		</Reference>
 		<Reference Include="WebSocketDotNet">
 			<HintPath>..\..\..\pvzVI\MelonLoader\net6\WebSocketDotNet.dll</HintPath>
+		</Reference>
+		<Reference Include="__Generated">
+		  <HintPath>..\..\..\..\Full Mod 3.0.1\BepInEx\interop\__Generated.dll</HintPath>
 		</Reference>
 	</ItemGroup>
 
